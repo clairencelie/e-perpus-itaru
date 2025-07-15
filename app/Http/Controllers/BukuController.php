@@ -44,7 +44,7 @@ class BukuController extends Controller
         $request->validate([
             'judul' => 'required|string|max:255',
             'tahun_terbit' => 'required|integer|min:1900|max:' . (date('Y') + 1),
-            'cover' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'cover' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:20480',
             'ISBN' => 'required|string|max:255|unique:buku,ISBN',
             'stok_buku' => 'required|integer|min:0',
             'deskripsi_buku' => 'nullable|string',
