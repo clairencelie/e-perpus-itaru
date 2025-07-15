@@ -35,13 +35,21 @@
             </label>
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-            @if (Route::has('password.request'))
-            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
-                {{ __('Forgot your password?') }}
+        <div class="flex items-center justify-between mt-4"> {{-- UBAH 'justify-end' menjadi 'justify-between' --}}
+            {{-- Bagian Kiri: Lupa Password & Register --}}
+            <div class="flex items-center"> {{-- Wrapper untuk link Lupa Password dan Register --}}
+                @if (Route::has('password.request'))
+                    <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
+                        {{ __('Forgot your password?') }}
+                    </a>
+                @endif
+            </div>
+            {{-- Tombol Register --}}
+            <a href="{{ route('register') }}" class="ms-3 inline-flex items-center px-4 py-2 bg-gray-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-600 focus:bg-gray-600 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                {{ __('Register') }}
             </a>
-            @endif
 
+            {{-- Bagian Kanan: Tombol Log in --}}
             <x-primary-button class="ms-3">
                 {{ __('Log in') }}
             </x-primary-button>
