@@ -31,10 +31,10 @@
                         {{ __('Manajemen Buku') }}
                     </x-nav-link>
                     <x-nav-link :href="route('peminjaman.index')" :active="request()->routeIs('peminjaman.*')">
-                        {{ __('Peminjaman Staff') }}
+                        {{ __('Transaksi') }}
                     </x-nav-link>
                     <x-nav-link :href="route('denda.index')" :active="request()->routeIs('denda.*')">
-                        {{ __('Denda Staff') }}
+                        {{ __('Denda Anggota') }}
                     </x-nav-link>
                     @endif
 
