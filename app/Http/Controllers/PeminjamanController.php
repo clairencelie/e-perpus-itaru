@@ -267,8 +267,7 @@ class PeminjamanController extends Controller
                 'is_rusak' => $isRusak,
                 'status_pembayaran' => 'belum_bayar',
             ]); // Update status jika ada denda
-        } else if ($request->kondisi_buku === 'hilang') {
-            $peminjaman->status_peminjaman = 'hilang';
+            $peminjaman->status_peminjaman = 'dikembalikan'; // Jika tidak ada denda
         } else {
             $peminjaman->status_peminjaman = 'dikembalikan'; // Jika tidak ada denda
         }
