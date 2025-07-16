@@ -18,14 +18,17 @@
 </head>
 
 <body class="font-sans text-gray-900 antialiased">
-    <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
+    <div class="min-h-screen flex flex-col sm:justify-center items-center pt-20 sm:pt-0 bg-gray-100">
         <div>
+            {{-- LOGO CUSTOM --}}
             <a href="/">
-                <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
+                <img src="{{ asset('images/logo.jpg') }}" alt="E-Perpus Itaru Logo" class="w-20 h-20 fill-current text-gray-500 mx-auto">
             </a>
         </div>
 
-        <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
+
+        {{-- CARD LOGIN/REGISTER --}}
+        <div class="w-full max-w-sm sm:max-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg"> {{-- TAMBAHKAN max-w-sm --}}
             {{ $slot }}
         </div>
     </div>

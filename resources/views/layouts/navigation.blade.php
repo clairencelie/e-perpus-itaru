@@ -19,7 +19,7 @@
                     {{-- MENU UNTUK STAFF DAN KEPALA PERPUSTAKAAN --}}
                     @if(Auth::user()->role === 'staff' || Auth::user()->role === 'kepala perpustakaan')
                     <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')"> {{-- TAMBAHKAN INI --}}
-                        {{ __('Manajemen Pengguna') }}
+                        {{ __('Keanggotaan') }}
                     </x-nav-link>
                     <x-nav-link :href="route('penerbit.index')" :active="request()->routeIs('penerbit.*')">
                         {{ __('Penerbit') }}
@@ -34,10 +34,10 @@
                         {{ __('Manajemen Buku') }}
                     </x-nav-link>
                     <x-nav-link :href="route('peminjaman.index')" :active="request()->routeIs('peminjaman.*')">
-                        {{ __('Peminjaman Staff') }}
+                        {{ __('Transaksi') }}
                     </x-nav-link>
                     <x-nav-link :href="route('denda.index')" :active="request()->routeIs('denda.*')">
-                        {{ __('Denda Staff') }}
+                        {{ __('List Denda') }}
                     </x-nav-link>
                     @endif
 
@@ -48,7 +48,7 @@
                         {{ __('Katalog Buku') }}
                     </x-nav-link>
                     <x-nav-link :href="route('peminjaman.my_history')" :active="request()->routeIs('peminjaman.my_history')">
-                        {{ __('Riwayat Peminjaman') }}
+                        {{ __('Riwayat Transaksi') }}
                     </x-nav-link>
                     <x-nav-link :href="route('denda.my_denda')" :active="request()->routeIs('denda.my_denda')">
                         {{ __('Denda Saya') }}
@@ -113,15 +113,58 @@
         </div>
     </div>
 
-    <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
+
+            {{-- MENU UNTUK STAFF DAN KEPALA PERPUSTAKAAN --}}
+            @if(Auth::user()->role === 'staff' || Auth::user()->role === 'kepala perpustakaan')
+            <x-responsive-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
+                {{ __('Keanggotaan') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('penerbit.index')" :active="request()->routeIs('penerbit.*')">
+                {{ __('Penerbit') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('pengarang.index')" :active="request()->routeIs('pengarang.*')">
+                {{ __('Pengarang') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('kategori.index')" :active="request()->routeIs('kategori.*')">
+                {{ __('Kategori') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('buku.index')" :active="request()->routeIs('buku.*')">
+                {{ __('Manajemen Buku') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('peminjaman.index')" :active="request()->routeIs('peminjaman.*')">
+                {{ __('Transaksi') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('denda.index')" :active="request()->routeIs('denda.*')">
+                {{ __('List Denda') }}
+            </x-responsive-nav-link>
+            @endif
+
+            {{-- MENU KHUSUS UNTUK KEPALA PERPUSTAKAAN SAJA --}}
+            @if(Auth::user()->role === 'kepala perpustakaan')
+            <x-responsive-nav-link :href="route('laporan.index')" :active="request()->routeIs('laporan.*')">
+                {{ __('Laporan') }}
+            </x-responsive-nav-link>
+            @endif
+
+            {{-- MENU UNTUK ANGGOTA (atau semua user terautentikasi) --}}
+            @if(Auth::user()->role === 'anggota')
+            <x-responsive-nav-link :href="route('katalog.index')" :active="request()->routeIs('katalog.*')">
+                {{ __('Katalog Buku') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('peminjaman.my_history')" :active="request()->routeIs('peminjaman.my_history')">
+                {{ __('Riwayat Transaksi') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('denda.my_denda')" :active="request()->routeIs('denda.my_denda')">
+                {{ __('Denda Saya') }}
+            </x-responsive-nav-link>
+            @endif
         </div>
 
-        <!-- Responsive Settings Options -->
         <div class="pt-4 pb-1 border-t border-gray-200">
             <div class="px-4">
                 <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
@@ -133,13 +176,12 @@
                     {{ __('Profile') }}
                 </x-responsive-nav-link>
 
-                <!-- Authentication -->
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
 
                     <x-responsive-nav-link :href="route('logout')"
                         onclick="event.preventDefault();
-                                        this.closest('form').submit();">
+                                                    this.closest('form').submit();">
                         {{ __('Log Out') }}
                     </x-responsive-nav-link>
                 </form>
