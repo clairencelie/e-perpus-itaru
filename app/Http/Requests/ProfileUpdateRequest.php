@@ -16,15 +16,13 @@ class ProfileUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => [
-                'required',
-                'string',
-                'lowercase',
-                'email',
-                'max:255',
-                Rule::unique(User::class)->ignore($this->user()->id),
-            ],
+            'username' => ['required', 'string', 'max:255', Rule::unique('users', 'username')->ignore($this->user()->id_user, 'id_user')],
+            'email' => ['email', 'max:255', Rule::unique('users', 'email')->ignore($this->user()->id_user, 'id_user')],
+            'nama' => ['required', 'string', 'max:255'],
+            'alamat' => ['nullable', 'string', 'max:255'],
+            'kampus' => ['nullable', 'string', 'max:255'],
+            'no_hp' => ['nullable', 'string', 'max:20'], // Sesuaikan panjang maks
+            'foto' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'], // Validasi untuk upload gambar
         ];
     }
 }
