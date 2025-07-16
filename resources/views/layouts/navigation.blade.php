@@ -18,6 +18,9 @@
 
                     {{-- MENU UNTUK STAFF DAN KEPALA PERPUSTAKAAN --}}
                     @if(Auth::user()->role === 'staff' || Auth::user()->role === 'kepala perpustakaan')
+                    <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')"> {{-- TAMBAHKAN INI --}}
+                        {{ __('Manajemen Pengguna') }}
+                    </x-nav-link>
                     <x-nav-link :href="route('penerbit.index')" :active="request()->routeIs('penerbit.*')">
                         {{ __('Penerbit') }}
                     </x-nav-link>
@@ -31,17 +34,10 @@
                         {{ __('Manajemen Buku') }}
                     </x-nav-link>
                     <x-nav-link :href="route('peminjaman.index')" :active="request()->routeIs('peminjaman.*')">
-                        {{ __('Transaksi') }}
+                        {{ __('Peminjaman Staff') }}
                     </x-nav-link>
                     <x-nav-link :href="route('denda.index')" :active="request()->routeIs('denda.*')">
-                        {{ __('Denda Anggota') }}
-                    </x-nav-link>
-                    @endif
-
-                    {{-- MENU KHUSUS UNTUK KEPALA PERPUSTAKAAN SAJA --}}
-                    @if(Auth::user()->role === 'kepala perpustakaan')
-                    <x-nav-link :href="route('laporan.index')" :active="request()->routeIs('laporan.*')">
-                        {{ __('Laporan') }}
+                        {{ __('Denda Staff') }}
                     </x-nav-link>
                     @endif
 
@@ -72,7 +68,7 @@
                                 <img class="h-8 w-8 rounded-full object-cover mr-2" src="{{ asset('storage/' . Auth::user()->foto) }}" alt="{{ Auth::user()->nama }}" />
                                 @else
                                 {{-- Placeholder SVG jika tidak ada foto --}}
-                                <svg class="h-8 w-8 text-gray-400 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                                <svg class="h-5 w-5 text-gray-400 mr-2" fill="currentColor" viewBox="0 0 24 24">
                                     <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM12 12.004A6 6 0 1012 0a6 6 0 000 12.004z" />
                                 </svg>
                                 @endif

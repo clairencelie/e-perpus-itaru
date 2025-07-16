@@ -10,6 +10,7 @@ use App\Http\Controllers\PenerbitController;
 use App\Http\Controllers\PengarangController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\LaporanController;
+use App\Http\Controllers\AdminUserController; // Import AdminUserController
 // use App\Http\Controllers\UserController; // Import jika Anda membuat kontroler khusus untuk manajemen user oleh admin
 
 /*
@@ -80,6 +81,7 @@ Route::middleware(['auth', 'role:staff'])->group(function () {
 
     // Modul Manajemen Denda oleh Staff (CRUD denda)
     Route::resource('denda', DendaController::class);
+    Route::resource('admin/users', AdminUserController::class)->names('admin.users');;
 
     // Contoh: Manajemen Anggota (Staff bisa melihat/edit anggota)
     // Jika Anda membuat UserController khusus untuk admin/staff, tambahkan rutenya di sini
