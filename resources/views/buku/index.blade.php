@@ -28,6 +28,34 @@
                     </div>
                     @endif
 
+                    {{-- FORM PENCARIAN/FILTER --}}
+                    <div class="mb-6">
+                        <form action="{{ route('buku.index') }}" method="GET" class="flex flex-col sm:flex-row gap-3 items-end">
+                            <div>
+                                <x-input-label for="search_buku" :value="__('Cari Buku')" />
+                                <x-text-input type="text" id="search_buku" name="search" placeholder="Judul, ISBN, Pengarang, Kategori..." class="flex-grow" value="{{ request('search') }}" />
+                            </div>
+                            <div>
+                                <x-input-label for="filter_penerbit" :value="__('Filter Penerbit')" />
+                                <select id="filter_penerbit" name="penerbit_id" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                                    <option value="">Semua Penerbit</option>
+                                    @foreach($penerbits as $penerbit)
+                                    <option value="{{ $penerbit->id_penerbit }}" @selected(request('penerbit_id')==$penerbit->id_penerbit)>{{ $penerbit->nama_penerbit }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <x-primary-button type="submit">
+                                {{ __('Filter') }}
+                            </x-primary-button>
+                            @if(request('search') || request('penerbit_id') || request('status_ketersediaan'))
+                            <a href="{{ route('buku.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-300 border border-transparent rounded-md font-semibold text-xs text-gray-800 uppercase tracking-widest hover:bg-gray-400 focus:bg-gray-400 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                {{ __('Reset') }}
+                            </a>
+                            @endif
+                        </form>
+                    </div>
+                    {{-- AKHIR FORM PENCARIAN/FILTER --}}
+
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200 table-fixed"> {{-- TAMBAHKAN table-fixed di sini --}}
                             <thead class="bg-gray-50">

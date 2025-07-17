@@ -13,10 +13,22 @@ class PenerbitController extends Controller
      * Display a listing of the resource.
      * Menampilkan daftar semua penerbit.
      */
-    public function index(): View
+    public function index(Request $request): View
     {
-        $penerbits = Penerbit::all(); // Ambil semua data penerbit
-        return view('penerbit.index', compact('penerbits')); // Kirim data ke view
+        $searchQuery = $request->input('search');
+
+        $query = Penerbit::query();
+
+        if ($searchQuery) {
+            $query->where(function($q) use ($searchQuery) {
+                $q->where('nama_penerbit', 'like', '%' . $searchQuery . '%')
+                  ->orWhere('alamat', 'like', '%' . $searchQuery . '%');
+            });
+        }
+
+        $penerbits = $query->orderBy('nama_penerbit')->get(); // Urutkan berdasarkan nama penerbit
+
+        return view('penerbit.index', compact('penerbits'));
     }
 
     /**

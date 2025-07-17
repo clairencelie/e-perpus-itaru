@@ -17,10 +17,45 @@ class BukuController extends Controller
      * Display a listing of the resource (untuk Staff/Admin).
      * Menampilkan daftar semua buku (untuk manajemen oleh Staff).
      */
-    public function index(): View
+    public function index(Request $request): View
     {
-        $bukus = Buku::with(['penerbit', 'pengarangs', 'kategoris'])->get(); // Eager load relasi
-        return view('buku.index', compact('bukus'));
+        $searchQuery = $request->input('search');
+        $filterPenerbitId = $request->input('penerbit_id');
+        // $filterStatusKetersediaan = $request->input('status_ketersediaan');
+
+        $query = Buku::query();
+
+        // Logika Filter Pencarian
+        if ($searchQuery) {
+            $query->where(function ($q) use ($searchQuery) {
+                $q->where('judul', 'like', '%' . $searchQuery . '%')
+                    ->orWhere('ISBN', 'like', '%' . $searchQuery . '%')
+                    ->orWhereHas('pengarangs', function ($qPengarang) use ($searchQuery) {
+                        $qPengarang->where('nama_pengarang', 'like', '%' . $searchQuery . '%');
+                    })
+                    ->orWhereHas('kategoris', function ($qKategori) use ($searchQuery) {
+                        $qKategori->where('nama_kategori', 'like', '%' . $searchQuery . '%');
+                    });
+            });
+        }
+
+        // Logika Filter Penerbit
+        if ($filterPenerbitId) {
+            $query->where('id_penerbit', $filterPenerbitId);
+        }
+
+        // // Logika Filter Status Ketersediaan
+        // if ($filterStatusKetersediaan) {
+        //     $query->where('status_ketersediaan', $filterStatusKetersediaan);
+        // }
+
+        // Eager load relasi yang dibutuhkan untuk tampilan
+        $bukus = $query->with(['penerbit', 'pengarangs', 'kategoris'])->orderBy('judul')->get();
+
+        // Ambil semua penerbit untuk dropdown filter
+        $penerbits = Penerbit::orderBy('nama_penerbit')->get();
+
+        return view('buku.index', compact('bukus', 'penerbits')); // Kirim $penerbits ke view
     }
 
     /**
@@ -198,30 +233,30 @@ class BukuController extends Controller
      */
     public function indexPublic(Request $request): View
     {
-                $searchQuery = $request->input('search'); // Ambil query pencarian
+        $searchQuery = $request->input('search'); // Ambil query pencarian
 
         $query = Buku::query(); // Mulai query
 
         // Filter hanya buku yang tersedia untuk dipinjam/dibaca
-        $query->where(function($q) {
+        $query->where(function ($q) {
             $q->where('stok_buku', '>', 0)
-              ->where('status_ketersediaan', 'tersedia')
-              ->orWhereNotNull('file_PDF')
-              ->orWhereNotNull('tautan_digital');
+                ->where('status_ketersediaan', 'tersedia')
+                ->orWhereNotNull('file_PDF')
+                ->orWhereNotNull('tautan_digital');
         });
 
 
         // Logika Filter Pencarian
         if ($searchQuery) {
-            $query->where(function($q) use ($searchQuery) {
+            $query->where(function ($q) use ($searchQuery) {
                 $q->where('judul', 'like', '%' . $searchQuery . '%') // Cari berdasarkan judul
-                  ->orWhere('ISBN', 'like', '%' . $searchQuery . '%') // Cari berdasarkan ISBN
-                  ->orWhereHas('pengarangs', function ($qPengarang) use ($searchQuery) { // Cari di relasi pengarang
-                      $qPengarang->where('nama_pengarang', 'like', '%' . $searchQuery . '%');
-                  })
-                  ->orWhereHas('kategoris', function ($qKategori) use ($searchQuery) { // Cari di relasi kategori
-                      $qKategori->where('nama_kategori', 'like', '%' . $searchQuery . '%');
-                  });
+                    ->orWhere('ISBN', 'like', '%' . $searchQuery . '%') // Cari berdasarkan ISBN
+                    ->orWhereHas('pengarangs', function ($qPengarang) use ($searchQuery) { // Cari di relasi pengarang
+                        $qPengarang->where('nama_pengarang', 'like', '%' . $searchQuery . '%');
+                    })
+                    ->orWhereHas('kategoris', function ($qKategori) use ($searchQuery) { // Cari di relasi kategori
+                        $qKategori->where('nama_kategori', 'like', '%' . $searchQuery . '%');
+                    });
             });
         }
 

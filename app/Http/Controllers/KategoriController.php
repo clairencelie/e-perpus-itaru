@@ -9,9 +9,18 @@ use Illuminate\View\View;
 
 class KategoriController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $kategoris = Kategori::all();
+        $searchQuery = $request->input('search');
+
+        $query = Kategori::query();
+
+        if ($searchQuery) {
+            $query->where('nama_kategori', 'like', '%' . $searchQuery . '%');
+        }
+
+        $kategoris = $query->orderBy('nama_kategori')->get(); // Urutkan berdasarkan nama kategori
+
         return view('kategori.index', compact('kategoris'));
     }
 

@@ -17,10 +17,47 @@ class PeminjamanController extends Controller
      * Display a listing of peminjaman (untuk Staff/Admin).
      * Menampilkan semua daftar peminjaman yang perlu diproses/dilihat oleh Staff.
      */
-    public function index(): View
+    public function index(Request $request): View
     {
-        // Tampilkan semua peminjaman dengan relasi terkait
-        $peminjaman = Peminjaman::with(['user', 'buku'])->orderBy('created_at', 'desc')->get();
+        $searchQuery = $request->input('search');
+        $filterStatusPeminjaman = $request->input('status_peminjaman');
+        $startDatePinjam = $request->input('start_date_pinjam');
+        $endDatePinjam = $request->input('end_date_pinjam');
+
+        $query = Peminjaman::with(['user', 'buku', 'denda']);
+
+        // Logika Filter Pencarian Umum (User atau Buku)
+        if ($searchQuery) {
+            $query->where(function ($q) use ($searchQuery) {
+                // Cari di relasi User
+                $q->whereHas('user', function ($qUser) use ($searchQuery) {
+                    $qUser->where('nama', 'like', '%' . $searchQuery . '%')
+                        ->orWhere('email', 'like', '%' . $searchQuery . '%')
+                        ->orWhere('username', 'like', '%' . $searchQuery . '%');
+                })
+                    // Atau cari di relasi Buku
+                    ->orWhereHas('buku', function ($qBuku) use ($searchQuery) {
+                        $qBuku->where('judul', 'like', '%' . $searchQuery . '%')
+                            ->orWhere('ISBN', 'like', '%' . $searchQuery . '%');
+                    });
+            });
+        }
+
+        // Logika Filter Status Peminjaman
+        if ($filterStatusPeminjaman) {
+            $query->where('status_peminjaman', $filterStatusPeminjaman);
+        }
+
+        // Logika Filter Tanggal Pinjam
+        if ($startDatePinjam) {
+            $query->whereDate('tanggal_pinjam', '>=', $startDatePinjam);
+        }
+        if ($endDatePinjam) {
+            $query->whereDate('tanggal_pinjam', '<=', $endDatePinjam);
+        }
+
+        $peminjaman = $query->orderBy('created_at', 'desc')->get();
+
         return view('peminjaman.index', compact('peminjaman'));
     }
 
@@ -148,7 +185,7 @@ class PeminjamanController extends Controller
         $endDate = $request->input('end_date');
 
         $query = Peminjaman::where('id_user', Auth::id())
-                            ->with(['buku', 'denda']);
+            ->with(['buku', 'denda']);
 
         // Logika Filter Tanggal
         if ($startDate) {

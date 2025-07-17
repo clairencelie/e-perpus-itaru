@@ -28,6 +28,44 @@
                     </div>
                     @endif
 
+                    {{-- FORM PENCARIAN/FILTER --}}
+                    <div class="mb-6">
+                        <form action="{{ route('peminjaman.index') }}" method="GET" class="flex flex-col sm:flex-row sm:flex-wrap gap-3 items-end">
+                            <div class="w-full sm:w-auto flex-grow">
+                                <x-input-label for="search_peminjaman" :value="__('Cari Peminjaman')" />
+                                <x-text-input type="text" id="search_peminjaman" name="search" placeholder="Nama Anggota, Judul Buku, ISBN..." class="w-full" value="{{ request('search') }}" />
+                            </div>
+                            <div>
+                                <x-input-label for="filter_status_peminjaman" :value="__('Status Peminjaman')" />
+                                <select id="filter_status_peminjaman" name="status_peminjaman" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                                    <option value="">Semua Status</option>
+                                    <option value="pending" @selected(request('status_peminjaman')=='pending' )>Pending</option>
+                                    <option value="dipinjam" @selected(request('status_peminjaman')=='dipinjam' )>Dipinjam</option>
+                                    <option value="diajukan_pengembalian" @selected(request('status_peminjaman')=='diajukan_pengembalian' )>Diajukan Pengembalian</option>
+                                    <option value="dikembalikan" @selected(request('status_peminjaman')=='dikembalikan' )>Dikembalikan</option>
+                                    <option value="ditolak" @selected(request('status_peminjaman')=='ditolak' )>Ditolak</option>
+                                </select>
+                            </div>
+                            <div>
+                                <x-input-label for="filter_start_date_pinjam" :value="__('Dari Tgl Pinjam')" />
+                                <x-text-input id="filter_start_date_pinjam" type="date" name="start_date_pinjam" :value="request('start_date_pinjam')" />
+                            </div>
+                            <div>
+                                <x-input-label for="filter_end_date_pinjam" :value="__('Sampai Tgl Pinjam')" />
+                                <x-text-input id="filter_end_date_pinjam" type="date" name="end_date_pinjam" :value="request('end_date_pinjam')" />
+                            </div>
+                            <x-primary-button type="submit">
+                                {{ __('Filter') }}
+                            </x-primary-button>
+                            @if(request('search') || request('status_peminjaman') || request('start_date_pinjam') || request('end_date_pinjam'))
+                            <a href="{{ route('peminjaman.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-300 border border-transparent rounded-md font-semibold text-xs text-gray-800 uppercase tracking-widest hover:bg-gray-400 focus:bg-gray-400 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                {{ __('Reset') }}
+                            </a>
+                            @endif
+                        </form>
+                    </div>
+                    {{-- AKHIR FORM PENCARIAN/FILTER --}}
+
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">

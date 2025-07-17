@@ -9,9 +9,18 @@ use Illuminate\View\View;
 
 class PengarangController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $pengarangs = Pengarang::all();
+        $searchQuery = $request->input('search');
+
+        $query = Pengarang::query();
+
+        if ($searchQuery) {
+            $query->where('nama_pengarang', 'like', '%' . $searchQuery . '%');
+        }
+
+        $pengarangs = $query->orderBy('nama_pengarang')->get(); // Urutkan berdasarkan nama pengarang
+
         return view('pengarang.index', compact('pengarangs'));
     }
 

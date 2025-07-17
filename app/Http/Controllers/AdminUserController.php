@@ -18,10 +18,32 @@ class AdminUserController extends Controller
      * Display a listing of the resource.
      * Menampilkan daftar semua pengguna (anggota, staff, kepala perpustakaan).
      */
-    public function index(): View
+    public function index(Request $request): View
     {
-        // Tampilkan semua user kecuali user yang sedang login (opsional) atau filter role tertentu
-        $users = User::orderBy('nama')->get();
+        $searchQuery = $request->input('search');
+        $filterRole = $request->input('role');
+
+        $query = User::query();
+
+        // Logika Filter Pencarian
+        if ($searchQuery) {
+            $query->where(function($q) use ($searchQuery) {
+                $q->where('username', 'like', '%' . $searchQuery . '%')
+                  ->orWhere('nama', 'like', '%' . $searchQuery . '%')
+                  ->orWhere('email', 'like', '%' . $searchQuery . '%')
+                  ->orWhere('alamat', 'like', '%' . $searchQuery . '%')
+                  ->orWhere('kampus', 'like', '%' . $searchQuery . '%')
+                  ->orWhere('no_hp', 'like', '%' . $searchQuery . '%');
+            });
+        }
+
+        // Logika Filter Role
+        if ($filterRole) {
+            $query->where('role', $filterRole);
+        }
+
+        $users = $query->orderBy('nama')->get(); // Urutkan berdasarkan nama
+
         return view('admin.users.index', compact('users'));
     }
 

@@ -28,6 +28,34 @@
                     </div>
                     @endif
 
+                    {{-- FORM PENCARIAN/FILTER --}}
+                    <div class="mb-6">
+                        <form action="{{ route('admin.users.index') }}" method="GET" class="flex flex-col sm:flex-row gap-3 items-end">
+                            <div>
+                                <x-input-label for="search_query" :value="__('Cari Pengguna')" />
+                                <x-text-input type="text" id="search_query" name="search" placeholder="Username, Nama, Email, Alamat..." class="flex-grow" value="{{ request('search') }}" />
+                            </div>
+                            <div>
+                                <x-input-label for="filter_role" :value="__('Filter Role')" />
+                                <select id="filter_role" name="role" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                                    <option value="">Semua Role</option>
+                                    <option value="anggota" @selected(request('role')=='anggota' )>Anggota</option>
+                                    <option value="staff" @selected(request('role')=='staff' )>Staff</option>
+                                    <option value="kepala perpustakaan" @selected(request('role')=='kepala perpustakaan' )>Kepala Perpustakaan</option>
+                                </select>
+                            </div>
+                            <x-primary-button type="submit">
+                                {{ __('Filter') }}
+                            </x-primary-button>
+                            @if(request('search') || request('role'))
+                            <a href="{{ route('admin.users.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-300 border border-transparent rounded-md font-semibold text-xs text-gray-800 uppercase tracking-widest hover:bg-gray-400 focus:bg-gray-400 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                {{ __('Reset') }}
+                            </a>
+                            @endif
+                        </form>
+                    </div>
+                    {{-- AKHIR FORM PENCARIAN/FILTER --}}
+
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200 table-fixed">
                             <thead class="bg-gray-50">
