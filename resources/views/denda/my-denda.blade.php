@@ -23,6 +23,37 @@
                     </div>
                     @endif
 
+                    {{-- FORM FILTER DENDA SAYA --}}
+                    <div class="mb-6">
+                        <form action="{{ route('denda.my_denda') }}" method="GET" class="flex flex-col sm:flex-row gap-3 items-end">
+                            <div>
+                                <x-input-label for="filter_status_pembayaran_saya" :value="__('Status Pembayaran')" />
+                                <select id="filter_status_pembayaran_saya" name="status_pembayaran" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                                    <option value="">Semua</option>
+                                    <option value="belum_bayar" @selected(request('status_pembayaran')=='belum_bayar' )>Belum Bayar</option>
+                                    <option value="lunas" @selected(request('status_pembayaran')=='lunas' )>Lunas</option>
+                                </select>
+                            </div>
+                            <div>
+                                <x-input-label for="filter_start_date_saya" :value="__('Dari Tanggal Dibuat')" />
+                                <x-text-input id="filter_start_date_saya" type="date" name="start_date" :value="request('start_date')" />
+                            </div>
+                            <div>
+                                <x-input-label for="filter_end_date_saya" :value="__('Sampai Tanggal Dibuat')" />
+                                <x-text-input id="filter_end_date_saya" type="date" name="end_date" :value="request('end_date')" />
+                            </div>
+                            <x-primary-button type="submit">
+                                {{ __('Filter') }}
+                            </x-primary-button>
+                            @if(request('status_pembayaran') || request('start_date') || request('end_date')) {{-- Tampilkan tombol reset jika ada filter --}}
+                            <a href="{{ route('denda.my_denda') }}" class="inline-flex items-center px-4 py-2 bg-gray-300 border border-transparent rounded-md font-semibold text-xs text-gray-800 uppercase tracking-widest hover:bg-gray-400 focus:bg-gray-400 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                {{ __('Reset') }}
+                            </a>
+                            @endif
+                        </form>
+                    </div>
+                    {{-- AKHIR FORM FILTER --}}
+
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">

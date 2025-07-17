@@ -27,6 +27,29 @@
                         {{ session('info') }}
                     </div>
                     @endif
+                    
+                    {{-- FORM FILTER TANGGAL --}}
+                    <div class="mb-6">
+                        <form action="{{ route('peminjaman.my_history') }}" method="GET" class="flex flex-col sm:flex-row gap-3 items-end">
+                            <div>
+                                <x-input-label for="start_date" :value="__('Dari Tanggal Pinjam')" />
+                                <x-text-input id="start_date" type="date" name="start_date" :value="request('start_date')" />
+                            </div>
+                            <div>
+                                <x-input-label for="end_date" :value="__('Sampai Tanggal Pinjam')" />
+                                <x-text-input id="end_date" type="date" name="end_date" :value="request('end_date')" />
+                            </div>
+                            <x-primary-button type="submit">
+                                {{ __('Filter') }}
+                            </x-primary-button>
+                            @if(request('start_date') || request('end_date')) {{-- Tampilkan tombol reset jika ada filter --}}
+                            <a href="{{ route('peminjaman.my_history') }}" class="inline-flex items-center px-4 py-2 bg-gray-300 border border-transparent rounded-md font-semibold text-xs text-gray-800 uppercase tracking-widest hover:bg-gray-400 focus:bg-gray-400 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                {{ __('Reset') }}
+                            </a>
+                            @endif
+                        </form>
+                    </div>
+                    {{-- AKHIR FORM FILTER --}}
 
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">

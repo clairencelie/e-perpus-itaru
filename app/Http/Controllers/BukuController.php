@@ -196,13 +196,39 @@ class BukuController extends Controller
      * Display a listing of books for public view (for Members).
      * Menampilkan daftar buku untuk katalog publik yang bisa dilihat Anggota.
      */
-    public function indexPublic(): View
+    public function indexPublic(Request $request): View
     {
-        $bukus = Buku::where('stok_buku', '>', 0) // Hanya tampilkan buku yang tersedia
-            ->where('status_ketersediaan', 'tersedia')
-            ->with(['penerbit', 'pengarangs', 'kategoris'])
-            ->get();
-        return view('katalog.index', compact('bukus')); // View baru untuk katalog
+                $searchQuery = $request->input('search'); // Ambil query pencarian
+
+        $query = Buku::query(); // Mulai query
+
+        // Filter hanya buku yang tersedia untuk dipinjam/dibaca
+        $query->where(function($q) {
+            $q->where('stok_buku', '>', 0)
+              ->where('status_ketersediaan', 'tersedia')
+              ->orWhereNotNull('file_PDF')
+              ->orWhereNotNull('tautan_digital');
+        });
+
+
+        // Logika Filter Pencarian
+        if ($searchQuery) {
+            $query->where(function($q) use ($searchQuery) {
+                $q->where('judul', 'like', '%' . $searchQuery . '%') // Cari berdasarkan judul
+                  ->orWhere('ISBN', 'like', '%' . $searchQuery . '%') // Cari berdasarkan ISBN
+                  ->orWhereHas('pengarangs', function ($qPengarang) use ($searchQuery) { // Cari di relasi pengarang
+                      $qPengarang->where('nama_pengarang', 'like', '%' . $searchQuery . '%');
+                  })
+                  ->orWhereHas('kategoris', function ($qKategori) use ($searchQuery) { // Cari di relasi kategori
+                      $qKategori->where('nama_kategori', 'like', '%' . $searchQuery . '%');
+                  });
+            });
+        }
+
+        // Eager load relasi yang dibutuhkan untuk tampilan
+        $bukus = $query->with(['penerbit', 'pengarangs', 'kategoris'])->get();
+
+        return view('katalog.index', compact('bukus'));
     }
 
     /**

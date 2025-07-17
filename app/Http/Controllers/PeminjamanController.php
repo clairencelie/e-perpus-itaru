@@ -142,12 +142,25 @@ class PeminjamanController extends Controller
      * Display current user's borrowing history (for Members).
      * Menampilkan riwayat peminjaman user yang sedang login.
      */
-    public function myHistory(): View
+    public function myHistory(Request $request): View
     {
-        $peminjamanSaya = Peminjaman::where('id_user', Auth::id())
-            ->with(['buku', 'denda'])
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+
+        $query = Peminjaman::where('id_user', Auth::id())
+                            ->with(['buku', 'denda']);
+
+        // Logika Filter Tanggal
+        if ($startDate) {
+            $query->whereDate('tanggal_pinjam', '>=', $startDate);
+        }
+        if ($endDate) {
+            // Kita ingin tanggal_pinjam sampai akhir hari dari endDate
+            $query->whereDate('tanggal_pinjam', '<=', $endDate);
+        }
+
+        $peminjamanSaya = $query->orderBy('created_at', 'desc')->get();
+
         return view('peminjaman.my-history', compact('peminjamanSaya'));
     }
 

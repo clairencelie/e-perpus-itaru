@@ -14,9 +14,29 @@ class DendaController extends Controller
      * Display a listing of the resource (untuk Staff/Admin).
      * Menampilkan daftar semua denda.
      */
-    public function index(): View
+    public function index(Request $request): View
     {
-        $dendas = Denda::with('peminjaman.user', 'peminjaman.buku')->orderBy('created_at', 'desc')->get();
+        $statusPembayaran = $request->input('status_pembayaran');
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+
+        $query = Denda::with('peminjaman.user', 'peminjaman.buku');
+
+        // Logika Filter Status Pembayaran
+        if ($statusPembayaran) {
+            $query->where('status_pembayaran', $statusPembayaran);
+        }
+
+        // Logika Filter Tanggal Dibuat
+        if ($startDate) {
+            $query->whereDate('created_at', '>=', $startDate);
+        }
+        if ($endDate) {
+            $query->whereDate('created_at', '<=', $endDate);
+        }
+
+        $dendas = $query->orderBy('created_at', 'desc')->get();
+
         return view('denda.index', compact('dendas'));
     }
 
@@ -84,14 +104,32 @@ class DendaController extends Controller
      * Display current user's fines (for Members).
      * Menampilkan daftar denda user yang sedang login.
      */
-    public function myDenda(): View
+    public function myDenda(Request $request): View
     {
-        $dendaSaya = Denda::whereHas('peminjaman', function ($query) {
-            $query->where('id_user', Auth::id());
+        $statusPembayaran = $request->input('status_pembayaran');
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+
+        $query = Denda::whereHas('peminjaman', function ($qPeminjaman) {
+            $qPeminjaman->where('id_user', Auth::id());
         })
-            ->with('peminjaman.buku')
-            ->orderBy('created_at', 'desc')
-            ->get();
+            ->with('peminjaman.buku');
+
+        // Logika Filter Status Pembayaran
+        if ($statusPembayaran) {
+            $query->where('status_pembayaran', $statusPembayaran);
+        }
+
+        // Logika Filter Tanggal Dibuat
+        if ($startDate) {
+            $query->whereDate('created_at', '>=', $startDate);
+        }
+        if ($endDate) {
+            $query->whereDate('created_at', '<=', $endDate);
+        }
+
+        $dendaSaya = $query->orderBy('created_at', 'desc')->get();
+
         return view('denda.my-denda', compact('dendaSaya'));
     }
 

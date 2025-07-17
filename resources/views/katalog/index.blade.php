@@ -23,6 +23,22 @@
                     </div>
                     @endif
 
+                    {{-- FORM PENCARIAN BUKU --}}
+                    <div class="mb-6">
+                        <form action="{{ route('katalog.index') }}" method="GET" class="flex flex-col sm:flex-row gap-3">
+                            <x-text-input type="text" name="search" placeholder="Cari judul, ISBN, pengarang, kategori..." class="flex-grow" value="{{ request('search') }}" />
+                            <x-primary-button type="submit">
+                                {{ __('Cari') }}
+                            </x-primary-button>
+                            @if(request('search')) {{-- Tampilkan tombol reset jika ada query search --}}
+                            <a href="{{ route('katalog.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-300 border border-transparent rounded-md font-semibold text-xs text-gray-800 uppercase tracking-widest hover:bg-gray-400 focus:bg-gray-400 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                {{ __('Reset') }}
+                            </a>
+                            @endif
+                        </form>
+                    </div>
+                    {{-- AKHIR FORM PENCARIAN --}}
+
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                         @forelse($bukus as $buku) {{-- Gunakan @forelse untuk pesan jika kosong --}}
                         <div class="bg-white rounded-lg shadow-md overflow-hidden flex flex-col">
