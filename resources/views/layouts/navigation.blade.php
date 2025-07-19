@@ -18,26 +18,52 @@
 
                     {{-- MENU UNTUK STAFF DAN KEPALA PERPUSTAKAAN --}}
                     @if(Auth::user()->role === 'staff' || Auth::user()->role === 'kepala perpustakaan')
-                    <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')"> {{-- TAMBAHKAN INI --}}
-                        {{ __('Keanggotaan') }}
+                    <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
+                        {{ __('Manajemen Pengguna') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('penerbit.index')" :active="request()->routeIs('penerbit.*')">
-                        {{ __('Penerbit') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('pengarang.index')" :active="request()->routeIs('pengarang.*')">
-                        {{ __('Pengarang') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('kategori.index')" :active="request()->routeIs('kategori.*')">
-                        {{ __('Kategori') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('buku.index')" :active="request()->routeIs('buku.*')">
-                        {{ __('Manajemen Buku') }}
-                    </x-nav-link>
+
+                    {{-- DROPDOWN BARU: MANAJEMEN DATA MASTER --}}
+                    <div class="hidden sm:flex sm:items-center sm:ms-6">
+                        <x-dropdown align="left" width="48"> {{-- Align ke kiri agar dropdown muncul di bawah menu --}}
+                            <x-slot name="trigger">
+                                <button type="button" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
+                                    {{ __('Manajemen Data Master') }}
+                                    <svg class="ms-2 -me-0.5 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                                    </svg>
+                                </button>
+                            </x-slot>
+
+                            <x-slot name="content">
+                                <x-dropdown-link :href="route('buku.index')">
+                                    {{ __('Buku') }}
+                                </x-dropdown-link>
+                                <x-dropdown-link :href="route('penerbit.index')">
+                                    {{ __('Penerbit') }}
+                                </x-dropdown-link>
+                                <x-dropdown-link :href="route('pengarang.index')">
+                                    {{ __('Pengarang') }}
+                                </x-dropdown-link>
+                                <x-dropdown-link :href="route('kategori.index')">
+                                    {{ __('Kategori') }}
+                                </x-dropdown-link>
+                            </x-slot>
+                        </x-dropdown>
+                    </div>
+                    {{-- AKHIR DROPDOWN BARU --}}
+
                     <x-nav-link :href="route('peminjaman.index')" :active="request()->routeIs('peminjaman.*')">
-                        {{ __('Transaksi') }}
+                        {{ __('Peminjaman Staff') }}
                     </x-nav-link>
                     <x-nav-link :href="route('denda.index')" :active="request()->routeIs('denda.*')">
-                        {{ __('List Denda') }}
+                        {{ __('Denda Staff') }}
+                    </x-nav-link>
+                    @endif
+
+                    {{-- MENU KHUSUS UNTUK KEPALA PERPUSTAKAAN SAJA --}}
+                    @if(Auth::user()->role === 'kepala perpustakaan')
+                    <x-nav-link :href="route('laporan.index')" :active="request()->routeIs('laporan.*')">
+                        {{ __('Laporan') }}
                     </x-nav-link>
                     @endif
 
