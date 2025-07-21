@@ -24,7 +24,7 @@
                     @endif
 
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {{-- Laporan Peminjaman --}}
+                        {{-- Laporan Peminjaman (MODIFIKASI DI SINI) --}}
                         <div class="bg-gray-50 p-6 rounded-lg shadow-md">
                             <h4 class="text-md font-semibold text-gray-800 mb-3">Laporan Peminjaman</h4>
                             <p class="text-sm text-gray-600 mb-4">Lihat daftar lengkap semua transaksi peminjaman buku.</p>
@@ -40,25 +40,16 @@
                                         <option value="ditolak">Ditolak</option>
                                     </select>
                                 </div>
-                                <x-primary-button class="justify-center">
-                                    {{ __('Generate PDF Laporan') }}
-                                </x-primary-button>
-                            </form>
-                        </div>
-
-                        {{-- Laporan Pengembalian --}}
-                        <div class="bg-gray-50 p-6 rounded-lg shadow-md">
-                            <h4 class="text-md font-semibold text-gray-800 mb-3">Laporan Pengembalian</h4>
-                            <p class="text-sm text-gray-600 mb-4">Lihat daftar lengkap semua transaksi pengembalian buku.</p>
-                            <form action="{{ route('laporan.generate.transaksi_tanggal_pdf') }}" method="GET" class="flex flex-col space-y-3">
+                                {{-- TAMBAHKAN INPUT TANGGAL INI --}}
                                 <div>
-                                    <x-input-label for="start_date_transaksi" :value="__('Dari Tanggal')" />
-                                    <x-text-input id="start_date_transaksi" class="block mt-1 w-full" type="date" name="start_date" :value="old('start_date')" />
+                                    <x-input-label for="start_date_peminjaman" :value="__('Dari Tanggal Transaksi')" />
+                                    <x-text-input id="start_date_peminjaman" class="block mt-1 w-full" type="date" name="start_date" :value="request('start_date')" />
                                 </div>
                                 <div>
-                                    <x-input-label for="end_date_transaksi" :value="__('Sampai Tanggal')" />
-                                    <x-text-input id="end_date_transaksi" class="block mt-1 w-full" type="date" name="end_date" :value="old('end_date')" />
+                                    <x-input-label for="end_date_peminjaman" :value="__('Sampai Tanggal Transaksi')" />
+                                    <x-text-input id="end_date_peminjaman" class="block mt-1 w-full" type="date" name="end_date" :value="request('end_date')" />
                                 </div>
+                                {{-- AKHIR INPUT TANGGAL --}}
                                 <x-primary-button class="justify-center">
                                     {{ __('Generate PDF Laporan') }}
                                 </x-primary-button>

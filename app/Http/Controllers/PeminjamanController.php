@@ -126,10 +126,9 @@ class PeminjamanController extends Controller
         ]);
 
         $buku = Buku::findOrFail($request->id_buku);
-        $userId = Auth::id(); // Ambil ID user yang sedang login
+        $userId = Auth::id();
 
-        // --- PENGECEKAN BARU: CEK DENDA BELUM LUNAS ---
-        // Cari denda yang terkait dengan user ini DAN statusnya 'belum_bayar'
+        // Pengecekan Denda Belum Lunas (tetap ada)
         $outstandingFinesCount = Denda::whereHas('peminjaman', function ($query) use ($userId) {
             $query->where('id_user', $userId);
         })
@@ -139,21 +138,27 @@ class PeminjamanController extends Controller
         if ($outstandingFinesCount > 0) {
             return redirect()->back()->with('error', 'Anda tidak dapat meminjam buku karena masih memiliki ' . $outstandingFinesCount . ' denda yang belum dilunasi.');
         }
-        // --- AKHIR PENGECEKAN BARU ---
 
-        if ($buku->file_PDF || $buku->tautan_digital) {
-            return redirect()->back()->with('error', 'Buku ini adalah buku digital dan tidak perlu dipinjam secara fisik. Silakan gunakan tombol "Baca Buku" untuk mengaksesnya.');
+        // --- PROTEKSI BUKU DIGITAL (DIUBAH) ---
+        // Jika buku memiliki file digital DAN TIDAK ADA stok fisik yang tersedia, barulah dilarang pinjam.
+        // Jika ada stok fisik, boleh dipinjam.
+        if (($buku->file_PDF || $buku->tautan_digital) && ($buku->stok_buku <= 0 || $buku->status_ketersediaan !== 'tersedia')) {
+            return redirect()->back()->with('error', 'Buku ini adalah buku digital dan/atau tidak tersedia secara fisik. Silakan gunakan tombol "Baca Buku" untuk mengaksesnya.');
+        }
+        // --- AKHIR PROTEKSI BUKU DIGITAL ---
+
+        // Periksa ketersediaan stok (logika ini sekarang hanya untuk buku fisik yang murni)
+        // Logika ini bisa lebih disederhanakan karena sudah dicover di proteksi buku digital di atas
+        // Namun, kita pertahankan jika buku tidak ada versi digitalnya tapi stoknya 0.
+        if (!$buku->file_PDF && !$buku->tautan_digital && ($buku->stok_buku <= 0 || $buku->status_ketersediaan !== 'tersedia')) {
+            return redirect()->back()->with('error', 'Maaf, buku fisik ini tidak tersedia untuk dipinjam saat ini.');
         }
 
-        // Periksa ketersediaan stok (logika yang sudah ada)
-        if ($buku->stok_buku <= 0 || $buku->status_ketersediaan !== 'tersedia') {
-            return redirect()->back()->with('error', 'Maaf, buku ini tidak tersedia untuk dipinjam saat ini.');
-        }
 
-        // Periksa apakah user sudah memiliki buku ini yang statusnya 'dipinjam' atau 'pending' (logika yang sudah ada)
-        $existingPeminjaman = Peminjaman::where('id_user', $userId) // Gunakan $userId yang sudah diambil
+        // Periksa apakah user sudah memiliki buku ini yang statusnya 'dipinjam' atau 'pending' (sudah ada)
+        $existingPeminjaman = Peminjaman::where('id_user', $userId)
             ->where('id_buku', $buku->id_buku)
-            ->whereIn('status_peminjaman', ['dipinjam', 'pending', 'diajukan_pengembalian']) // Tambahkan 'diajukan_pengembalian' juga
+            ->whereIn('status_peminjaman', ['dipinjam', 'pending', 'terlambat', 'diajukan_pengembalian'])
             ->first();
 
         if ($existingPeminjaman) {

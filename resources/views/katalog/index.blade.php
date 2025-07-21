@@ -40,11 +40,11 @@
                     {{-- AKHIR FORM PENCARIAN --}}
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                        @forelse($bukus as $buku) {{-- Gunakan @forelse untuk pesan jika kosong --}}
+                        @forelse($bukus as $buku)
                         <div class="bg-white rounded-lg shadow-md overflow-hidden flex flex-col">
                             {{-- Tampilkan Cover Buku --}}
                             @if($buku->cover)
-                            <img src="{{ asset('storage/' . $buku->cover) }}" alt="Cover {{ $buku->judul }}" class="w-full h-64 object-contain">
+                            <img src="{{ asset('storage/' . $buku->cover) }}" alt="Cover {{ $buku->judul }}" class="w-full h-48 object-cover">
                             @else
                             {{-- Placeholder jika tidak ada cover --}}
                             <div class="w-full h-48 bg-gray-200 flex items-center justify-center text-gray-500">
@@ -52,31 +52,60 @@
                             </div>
                             @endif
 
-                            <div class="p-4 flex-grow"> {{-- Tambah flex-grow agar konten mengisi ruang --}}
+                            <div class="p-4 flex-grow">
                                 <h4 class="font-bold text-lg text-gray-900 mb-2">{{ $buku->judul }}</h4>
                                 <p class="text-sm text-gray-600 mb-1">Oleh: {{ $buku->pengarangs->pluck('nama_pengarang')->join(', ') }}</p>
                                 <p class="text-sm text-gray-600 mb-1">Penerbit: {{ $buku->penerbit->nama_penerbit ?? '-' }}</p>
                                 <p class="text-sm text-gray-600 mb-1">Tahun: {{ $buku->tahun_terbit }}</p>
-                                <p class="text-sm text-gray-600 mb-1">Kategori: {{ $buku->kategoris->pluck('nama_kategori')->join(', ') }}</p>
-                                {{-- Kondisi untuk menampilkan Stok dan Status hanya jika BUKAN buku digital --}}
-                                @if (!$buku->file_PDF && !$buku->tautan_digital)
+
+                                {{-- INFORMASI KETERSEDIAAN BARU --}}
+                                @php
+                                $hasDigitalFile = $buku->file_PDF || $buku->tautan_digital;
+                                $isPhysicalType = $buku->stok_buku > 0 || $buku->status_ketersediaan === 'dipinjam' || $buku->status_ketersediaan === 'hilang';
+                                $physicalStatusText = '';
+                                $digitalStatusText = '';
+
+                                if ($isPhysicalType) {
+                                $physicalStatusText = "Fisik: " . $buku->stok_buku . " tersedia (" . ucfirst($buku->status_ketersediaan) . ")";
+                                }
+
+                                if ($hasDigitalFile) {
+                                $digitalStatusText = "Digital: Tersedia";
+                                }
+                                @endphp
+
+                                @if($isPhysicalType && $hasDigitalFile)
+                                <p class="text-sm text-gray-600 mb-1">Stok: <span class="font-semibold">{{ $buku->stok_buku }}</span> (Fisik)</p>
+                                <p class="text-sm text-gray-600 mb-3">Status: <span class="font-semibold text-green-600">Tersedia Fisik</span> & <span class="font-semibold text-purple-600">Digital</span></p>
+                                @elseif($isPhysicalType)
                                 <p class="text-sm text-gray-600 mb-1">Stok: <span class="font-semibold">{{ $buku->stok_buku }}</span></p>
                                 <p class="text-sm text-gray-600 mb-3">Status: <span class="font-semibold text-green-600">{{ ucfirst($buku->status_ketersediaan) }}</span></p>
+                                @elseif($hasDigitalFile)
+                                <p class="text-sm text-gray-600 mb-3">Status: <span class="font-semibold text-purple-600">Hanya Tersedia Digital</span></p>
                                 @else
-                                <p class="text-sm text-gray-600 mb-3">Jenis: <span class="font-semibold text-purple-600">Digital</span></p> {{-- Opsional: tampilkan "Digital" --}}
+                                <p class="text-sm text-gray-600 mb-3">Status: <span class="font-semibold text-red-600">Tidak Tersedia</span></p>
                                 @endif
+                                {{-- AKHIR INFORMASI KETERSEDIAAN BARU --}}
                             </div>
 
-                            {{-- Tombol Aksi (Pinjam/Baca/Tidak Tersedia) dan Detail --}}
+                            {{-- Tombol Aksi (Pinjam/Baca) dan Detail --}}
                             <div class="p-4 bg-gray-100 border-t border-gray-200 flex flex-col space-y-2">
                                 @auth
                                 @if(Auth::user()->role === 'anggota')
-                                @if ($buku->file_PDF || $buku->tautan_digital)
+                                @php
+                                $canRead = $buku->file_PDF || $buku->tautan_digital;
+                                $canBorrow = $buku->stok_buku > 0 && $buku->status_ketersediaan == 'tersedia';
+                                @endphp
+
+                                @if ($canRead)
                                 {{-- Tombol Baca untuk buku digital --}}
-                                <a href="{{ $buku->file_PDF ? asset('storage/' . str_replace('public/', '', $buku->file_PDF)) : $buku->tautan_digital }}" target="_blank" class="w-full text-center bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition ease-in-out duration-150 font-semibold text-xs uppercase tracking-widest">
+                                <a href="{{ $buku->file_PDF ? asset('storage/' . $buku->file_PDF) : $buku->tautan_digital }}" target="_blank"
+                                    class="w-full text-center bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition ease-in-out duration-150 font-semibold text-xs uppercase tracking-widest">
                                     {{ __('Baca Buku') }}
                                 </a>
-                                @elseif ($buku->stok_buku > 0 && $buku->status_ketersediaan == 'tersedia')
+                                @endif
+
+                                @if ($canBorrow)
                                 {{-- Tombol Pinjam untuk buku fisik yang tersedia --}}
                                 <form action="{{ route('peminjaman.request_borrow') }}" method="POST" class="w-full">
                                     @csrf
@@ -85,8 +114,10 @@
                                         {{ __('Pinjam') }}
                                     </button>
                                 </form>
-                                @else
-                                {{-- Notifikasi Tidak Tersedia untuk buku fisik yang tidak tersedia --}}
+                                @endif
+
+                                @if (!$canRead && !$canBorrow)
+                                {{-- Notifikasi Tidak Tersedia jika tidak bisa dibaca maupun dipinjam --}}
                                 <span class="block w-full text-center text-red-600 text-xs font-semibold py-2">Tidak Tersedia</span>
                                 @endif
                                 @endif
