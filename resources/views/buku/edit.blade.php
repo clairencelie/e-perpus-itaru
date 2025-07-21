@@ -137,7 +137,7 @@
                         <div class="mt-4">
                             <x-input-label for="file_PDF" :value="__('File PDF (Opsional)')" />
                             @if ($buku->file_PDF)
-                            <p class="text-sm text-gray-600 mb-2">File saat ini: <a href="{{ Storage::url($buku->file_PDF) }}" target="_blank" class="text-blue-600 hover:underline">Lihat PDF</a></p>
+                            <p class="text-sm text-gray-600 mb-2">File saat ini: <a href="{{ asset('storage/' . $buku->file_PDF) }}" target="_blank" class="text-blue-600 hover:underline">Lihat PDF</a></p>
                             @endif
                             <input id="file_PDF" type="file" name="file_PDF" class="block mt-1 w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none">
                             <x-input-error :messages="$errors->get('file_PDF')" class="mt-2" />
