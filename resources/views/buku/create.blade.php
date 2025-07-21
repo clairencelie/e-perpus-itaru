@@ -26,20 +26,34 @@
                             <x-input-error :messages="$errors->get('tahun_terbit')" class="mt-2" />
                         </div>
 
-                        <div class="mb-4">
-                            <label for="cover" class="block text-sm font-medium text-gray-700">Cover Buku</label>
-                            <input type="file" name="cover" id="cover" class="mt-1 block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none">
-                            @error('cover')
-                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                            @enderror
-                            {{-- Untuk edit.blade.php, tampilkan cover lama jika ada --}}
-                            @if(isset($buku) && $buku->cover)
-                            <div class="mt-2">
-                                <p class="text-sm text-gray-600">Cover saat ini:</p>
-                                <img src="{{ asset('storage/' . $buku->cover) }}" alt="Cover Buku" class="w-24 h-auto object-cover rounded-md mt-1">
+                        {{-- COVER BUKU --}}
+                        <div class="mt-4">
+                            <x-input-label for="cover" :value="__('Cover Buku')" />
+                            <div class="flex items-center mt-2 space-x-4">
+                                {{-- Kontainer untuk Pratinjau Gambar --}}
+                                <div class="w-24 h-24 sm:w-32 sm:h-32 rounded-lg overflow-hidden border-2 border-gray-200 flex items-center justify-center bg-gray-100 shadow-sm">
+                                    {{-- Pratinjau cover baru (awalnya tersembunyi) --}}
+                                    <img id="new-cover-preview" src="#" alt="Pratinjau Cover" class="w-full h-full object-contain hidden">
+
+                                    {{-- Placeholder SVG (awalnya ditampilkan) --}}
+                                    <svg id="default-cover-placeholder" class="w-16 h-16 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M4 6h16v12H4V6zm14 2H6v8h12V8zm-6 2c-.55 0-1 .45-1 1s.45 1 1 1h4c.55 0 1-.45 1-1s-.45-1-1-1h-4zM6 14h12v-2H6v2z" />
+                                    </svg>
+                                </div>
+
+                                {{-- Input File Cover --}}
+                                <div>
+                                    <input id="cover" type="file" name="cover" class="hidden">
+                                    <label for="cover" class="cursor-pointer inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                        Pilih Cover
+                                    </label>
+                                    <span id="cover-file-name" class="ms-2 text-sm text-gray-600"></span>
+                                    <x-input-error :messages="$errors->get('cover')" class="mt-2" />
+                                    <p class="text-xs text-gray-500 mt-1">Ukuran maks 2MB, format JPG, PNG, GIF, SVG.</p>
+                                </div>
                             </div>
-                            @endif
                         </div>
+                        {{-- AKHIR COVER BUKU --}}
 
                         {{-- ISBN --}}
                         <div class="mt-4">
@@ -142,3 +156,66 @@
         </div>
     </div>
 </x-app-layout>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Script cover preview loaded and DOM ready!'); // LOG 1
+
+        const coverInput = document.getElementById('cover');
+        const coverFileNameSpan = document.getElementById('cover-file-name');
+        const defaultCoverPlaceholder = document.getElementById('default-cover-placeholder');
+        const newCoverPreview = document.getElementById('new-cover-preview');
+
+        // Pastikan elemen ditemukan
+        if (!coverInput) {
+            console.error('Element with ID "cover" not found!');
+            return;
+        } // LOG ERROR
+        if (!newCoverPreview) {
+            console.error('Element with ID "new-cover-preview" not found!');
+            return;
+        } // LOG ERROR
+
+        console.log('Elements found. Attaching event listener to coverInput.', coverInput); // LOG 2
+
+        coverInput.addEventListener('change', function(event) {
+            console.log('Change event fired on cover input.'); // LOG 3
+            const file = event.target.files[0];
+
+            if (file) {
+                console.log('File selected:', file.name, file.type, file.size); // LOG 4
+                coverFileNameSpan.innerText = file.name;
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    console.log('FileReader onload event fired. Result type:', typeof e.target.result); // LOG 5
+                    newCoverPreview.src = e.target.result; // Set src gambar pratinjau
+                    newCoverPreview.classList.remove('hidden'); // Tampilkan gambar pratinjau
+                    console.log('newCoverPreview.classList after remove hidden:', newCoverPreview.classList.toString()); // LOG 6
+
+                    if (defaultCoverPlaceholder) {
+                        defaultCoverPlaceholder.classList.add('hidden'); // Sembunyikan placeholder default
+                        console.log('defaultCoverPlaceholder hidden.'); // LOG 7
+                    }
+                };
+                reader.onerror = function(e) { // Tambahkan error handler untuk FileReader
+                    console.error('FileReader error:', e);
+                    alert('Gagal membaca file gambar. Silakan coba lagi atau gunakan file lain.');
+                };
+                reader.readAsDataURL(file); // Baca file sebagai URL data
+            } else {
+                console.log('No file selected (or selection cancelled).'); // LOG 8
+                coverFileNameSpan.innerText = '';
+                newCoverPreview.classList.add('hidden'); // Sembunyikan pratinjau
+                newCoverPreview.src = '#'; // Reset src agar gambar lama tidak terlihat (PENTING)
+
+                // Tampilkan kembali placeholder default
+                if (defaultCoverPlaceholder) {
+                    defaultCoverPlaceholder.classList.remove('hidden');
+                    console.log('defaultCoverPlaceholder shown.'); // LOG 9
+                }
+            }
+        });
+    });
+</script>
+{{-- AKHIR SCRIPT JAVASCRIPT --}}
