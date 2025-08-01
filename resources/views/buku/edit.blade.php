@@ -121,18 +121,7 @@
                             <textarea id="deskripsi_buku" name="deskripsi_buku" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">{{ old('deskripsi_buku', $buku->deskripsi_buku) }}</textarea>
                             <x-input-error :messages="$errors->get('deskripsi_buku')" class="mt-2" />
                         </div>
-
-                        {{-- Status Ketersediaan --}}
-                        <div class="mt-4">
-                            <x-input-label for="status_ketersediaan" :value="__('Status Ketersediaan')" />
-                            <select id="status_ketersediaan" name="status_ketersediaan" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
-                                <option value="tersedia" @selected(old('status_ketersediaan', $buku->status_ketersediaan) == 'tersedia')>Tersedia</option>
-                                <option value="dipinjam" @selected(old('status_ketersediaan', $buku->status_ketersediaan) == 'dipinjam')>Dipinjam</option>
-                                <option value="hilang" @selected(old('status_ketersediaan', $buku->status_ketersediaan) == 'hilang')>Hilang</option>
-                            </select>
-                            <x-input-error :messages="$errors->get('status_ketersediaan')" class="mt-2" />
-                        </div>
-
+                        
                         {{-- File PDF --}}
                         <div class="mt-4">
                             <x-input-label for="file_PDF" :value="__('File PDF (Opsional)')" />

@@ -83,7 +83,6 @@ class BukuController extends Controller
             'ISBN' => 'required|string|max:255|unique:buku,ISBN',
             'stok_buku' => 'required|integer|min:0',
             'deskripsi_buku' => 'nullable|string',
-            'status_ketersediaan' => 'required|in:tersedia,dipinjam,hilang',
             'file_PDF' => 'nullable|file|mimes:pdf|max:10240', // Max 10MB
             'tautan_digital' => 'nullable|url|max:255',
             'id_penerbit' => 'nullable|exists:penerbit,id_penerbit',
@@ -158,7 +157,6 @@ class BukuController extends Controller
             'ISBN' => 'required|string|max:255|unique:buku,ISBN,' . $buku->id_buku . ',id_buku',
             'stok_buku' => 'required|integer|min:0',
             'deskripsi_buku' => 'nullable|string',
-            'status_ketersediaan' => 'required|in:tersedia,dipinjam,hilang',
             'file_PDF' => 'nullable|file|mimes:pdf|max:10240',
             'tautan_digital' => 'nullable|url|max:255',
             'id_penerbit' => 'nullable|exists:penerbit,id_penerbit',
