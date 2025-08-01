@@ -22,7 +22,7 @@
                         <x-dropdown align="left" width="48">
                             <x-slot name="trigger">
                                 <button type="button" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
-                                    {{ __('Master Anggota') }}
+                                    {{ __('Keanggotaan') }}
                                     <svg class="ms-2 -me-0.5 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                                     </svg>
@@ -48,7 +48,7 @@
                         <x-dropdown align="left" width="48">
                             <x-slot name="trigger">
                                 <button type="button" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
-                                    {{ __('Manajemen Data Master') }}
+                                    {{ __('Manajemen Buku') }}
                                     <svg class="ms-2 -me-0.5 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                                     </svg>
@@ -161,7 +161,7 @@
             @if(Auth::user()->role === 'staff')
             {{-- HEADER UNTUK MASTER ANGGOTA DI RESPONSIVE --}}
             <div class="block w-full ps-3 pe-4 py-2 border-l-4 border-transparent text-start text-base font-medium text-gray-600">
-                {{ __('Master Anggota') }}
+                {{ __('Keanggotaan') }}
             </div>
             <x-responsive-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
                 {{ __('Manajemen Pengguna') }}
@@ -176,7 +176,7 @@
 
             {{-- HEADER UNTUK MANAJEMEN DATA MASTER DI RESPONSIVE --}}
             <div class="block w-full ps-3 pe-4 py-2 border-l-4 border-transparent text-start text-base font-medium text-gray-600">
-                {{ __('Manajemen Data Master') }}
+                {{ __('Manajemen Buku') }}
             </div>
             <x-responsive-nav-link :href="route('buku.index')" :active="request()->routeIs('buku.*')">
                 {{ __('Buku') }}
