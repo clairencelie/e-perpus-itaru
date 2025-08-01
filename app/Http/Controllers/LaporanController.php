@@ -126,6 +126,8 @@ class LaporanController extends Controller
     {
         $request->validate([
             'status' => 'nullable|string|in:pending,dipinjam,diajukan_pengembalian,dikembalikan,terlambat,hilang,ditolak',
+            'start_date' => 'nullable|date', // <-- TAMBAHKAN VALIDASI INI
+            'end_date' => 'nullable|date|after_or_equal:start_date', // <-- TAMBAHKAN VALIDASI INI
         ]);
 
         $query = Peminjaman::with(['user', 'buku']);
@@ -134,12 +136,38 @@ class LaporanController extends Controller
             $query->where('status_peminjaman', $request->status);
         }
 
+        // --- LOGIKA FILTER TANGGAL BARU ---
+        if ($request->filled('start_date')) {
+            // Filter berdasarkan tanggal pinjam atau tanggal pengembalian
+            $query->where(function ($q) use ($request) {
+                $q->whereDate('tanggal_pinjam', '>=', $request->start_date)
+                    ->orWhereDate('tanggal_pengembalian', '>=', $request->start_date);
+            });
+        }
+        if ($request->filled('end_date')) {
+            // Filter berdasarkan tanggal pinjam atau tanggal pengembalian
+            $query->where(function ($q) use ($request) {
+                $q->whereDate('tanggal_pinjam', '<=', $request->end_date)
+                    ->orWhereDate('tanggal_pengembalian', '<=', $request->end_date);
+            });
+        }
+        // --- AKHIR LOGIKA FILTER TANGGAL BARU ---
+
         $peminjamanData = $query->orderBy('created_at', 'desc')->get();
-        $reportTitle = 'Laporan Status Peminjaman';
-        $filterApplied = $request->status ? 'Status: ' . ucfirst($request->status) : 'Semua Status';
+        $reportTitle = 'Laporan Peminjaman & Pengembalian';
+        $filterApplied = '';
+        if ($request->status) $filterApplied .= 'Status: ' . ucfirst($request->status) . '. ';
+        if ($request->start_date && $request->end_date) {
+            $filterApplied .= "Dari Tanggal: " . Carbon::parse($request->start_date)->format('d M Y') . " - Sampai Tanggal: " . Carbon::parse($request->end_date)->format('d M Y');
+        } elseif ($request->start_date) {
+            $filterApplied .= "Dari Tanggal: " . Carbon::parse($request->start_date)->format('d M Y');
+        } elseif ($request->end_date) {
+            $filterApplied .= "Sampai Tanggal: " . Carbon::parse($request->end_date)->format('d M Y');
+        }
+        if (!$filterApplied) $filterApplied = 'Semua Transaksi';
 
         $pdf = Pdf::loadView('laporan.pdf.peminjaman_status', compact('peminjamanData', 'reportTitle', 'filterApplied'));
-        return $pdf->download('laporan-status-peminjaman-' . Carbon::now()->format('Ymd_His') . '.pdf');
+        return $pdf->download('laporan-peminjaman-pengembalian-' . Carbon::now()->format('Ymd_His') . '.pdf');
     }
 
     /**
